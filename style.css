@@ -97,3 +97,14 @@ button.scene:focus {
 @keyframes blink {
   50% { opacity: 0; }
 }
+.instruction-grid {
+  display: flex;
+  justify-content: center;
+  gap: 10px; /* Add spacing between buttons */
+  margin-top: 10px; /* Add spacing above the grid */
+}
+
+.instruction-grid button {
+  padding: 10px 20px;
+  font-size: 16px;
+}
