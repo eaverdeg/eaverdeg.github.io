@@ -1,5 +1,5 @@
-const SERVICE_UUID = '0000180c-0000-1000-8000-00805f9b34fb'; // Custom service UUID
-const POT_CHAR_UUID = '00002a56-0000-1000-8000-00805f9b34fb'; // Potentiometer characteristic UUID
+const SERVICE_UUID = '0000180c-0000-1000-8000-00805f9b34fb';
+const POT_CHAR_UUID = '00002a56-0000-1000-8000-00805f9b34fb';
 let buttonCharacteristic;
 
 async function connectBLE() {
@@ -7,7 +7,7 @@ async function connectBLE() {
   const potValue = document.getElementById('potValue');
   try {
     status.textContent = 'Requesting Bluetooth device...';
-    status.className = ''; // Reset status class
+    status.className = '';
     const device = await navigator.bluetooth.requestDevice({
       filters: [{ namePrefix: 'Nano33-Test' }],
       optionalServices: [SERVICE_UUID]
@@ -16,18 +16,17 @@ async function connectBLE() {
     status.textContent = 'Connecting...';
     const server = await device.gatt.connect();
     const service = await server.getPrimaryService(SERVICE_UUID);
-    characteristic = await service.getCharacteristic(POT_CHAR_UUID);
-    buttonCharacteristic = await service.getCharacteristic('00002a57-0000-1000-8000-00805f9b34fb'); // Button characteristic
+    const characteristic = await service.getCharacteristic(POT_CHAR_UUID);
+    buttonCharacteristic = await service.getCharacteristic('00002a57-0000-1000-8000-00805f9b34fb');
 
     status.textContent = 'Connected to device!';
-    status.className = 'success'; // Set status to green
+    status.className = 'success';
 
-    // Read potentiometer value periodically
     setInterval(async () => {
       try {
         const value = await characteristic.readValue();
-        const potValueInt = value.getUint16(0, true); // Read as 16-bit unsigned integer
-        console.log('Raw Potentiometer Value:', potValueInt); // Log raw value
+        const potValueInt = value.getUint16(0, true);
+        console.log('Raw Potentiometer Value:', potValueInt);
         potValue.textContent = `Potentiometer Value: ${potValueInt}`;
       } catch (error) {
         console.error('Error reading potentiometer value:', error);
@@ -36,26 +35,49 @@ async function connectBLE() {
 
     device.addEventListener('gattserverdisconnected', () => {
       status.textContent = 'Disconnected from device';
-      status.className = 'error'; // Set status to red
+      status.className = 'error';
       potValue.textContent = 'Potentiometer Value: N/A';
     });
   } catch (error) {
     console.error('Error:', error);
     status.textContent = 'Error: ' + error.message;
-    status.className = 'error'; // Set status to red
+    status.className = 'error';
   }
 }
 
-function buttonClick(buttonNumber) {
-  console.log(`Button ${buttonNumber} clicked`);
+function buttonClick(buttonId) {
+  console.log(`Button ${buttonId} clicked`);
   if (buttonCharacteristic) {
-    const value = new Uint8Array([buttonNumber]);
+    const value = new TextEncoder().encode(buttonId); // Encode the button ID as a string
     buttonCharacteristic.writeValue(value).then(() => {
-      console.log(`Button ${buttonNumber} sent to Arduino`);
+      console.log(`Button ${buttonId} sent to Arduino`);
     }).catch(error => {
       console.error('Error sending button press:', error);
     });
   } else {
     console.error('Button characteristic not available');
+  }
+}
+
+async function connectWiFi() {
+  const ssid = document.getElementById('ssid').value;
+  const password = document.getElementById('password').value;
+  if (!ssid || !password) {
+    alert('Please enter both SSID and password.');
+    return;
+  }
+
+  console.log(`Connecting to Wi-Fi with SSID: ${ssid} and Password: ${password}`);
+  if (buttonCharacteristic) {
+    const wifiData = new TextEncoder().encode(`${ssid},${password}`);
+    try {
+      await buttonCharacteristic.writeValue(wifiData);
+      alert('Wi-Fi credentials sent to the device.');
+    } catch (error) {
+      console.error('Error sending Wi-Fi credentials:', error);
+      alert('Failed to send Wi-Fi credentials.');
+    }
+  } else {
+    alert('BLE connection not established. Please connect to the BLE device first.');
   }
 }
