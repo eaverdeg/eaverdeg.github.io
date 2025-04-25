@@ -4,41 +4,25 @@
   <meta charset="utf-8">
   <title>BLE Potentiometer</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <style>
-    body { font-family: sans-serif; padding: 20px; max-width: 400px; margin: auto; }
-    input, button { display: block; width: 100%; padding: 10px; margin-top: 10px; font-size: 16px; }
-    #status { margin-top: 20px; font-weight: bold; }
-    #potValue { margin-top: 20px; font-size: 18px; }
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 10px;
-      margin-top: 20px;
-    }
-    .grid button {
-      padding: 20px;
-      font-size: 16px;
-    }
-    .blink { animation: blink 1s infinite; }
-    @keyframes blink { 50% { opacity: 0; } }
-  </style>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <h2>BLE Potentiometer</h2>
+  <h2>BLE remote</h2>
   <button onclick="connectBLE()">Connect to BLE Device</button>
   <div id="status">Status: Not connected</div>
   <div id="potValue">Potentiometer Value: N/A</div>
 
   <div class="grid">
-    <button onclick="buttonClick(1)">A1</button>
-    <button onclick="buttonClick(2)">A2</button>
-    <button onclick="buttonClick(3)">A3</button>
-    <button onclick="buttonClick(4)">B1</button>
-    <button onclick="buttonClick(5)">B2</button>
-    <button onclick="buttonClick(6)">B3</button>
-    <button onclick="buttonClick(7)">C1</button>
-    <button onclick="buttonClick(8)">C2</button>
-    <button onclick="buttonClick(9)">C3</button>
+    <button class="light" onclick="buttonClick(1)">Man</button>
+    <button class="light" onclick="buttonClick(2)">Vrouw</button>
+    <button class="light" onclick="buttonClick(3)">Partner</button>
+    <button class="sound" onclick="buttonClick(4)">Beacon</button>
+    <button class="sound" onclick="buttonClick(5)">Focus</button>
+    <button class="sound" onclick="buttonClick(6)">Monitor</button>
+    <button class="scene" onclick="buttonClick(7)">Bed</button>
+    <button class="scene" onclick="buttonClick(8)">Kamer</button>
+    <button class="scene" onclick="buttonClick(9)">Gang</button>
+    <button class="scene" onclick="buttonClick(10)">Toilet</button>
   </div>
 
   <script>
