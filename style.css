@@ -1,0 +1,67 @@
+body {
+  font-family: sans-serif;
+  font-size: 14px;
+  padding: 20px;
+  max-width: 400px;
+  margin: auto;
+  background-color: black;
+  color: #555;
+}
+input, button {
+  display: block;
+  font-size: 12px;
+  width: 100%;
+  padding: 10px;
+  margin-top: 10px;
+  background-color: #111;
+  color: #555;
+  border: 1px solid #222;
+  border-radius: 5px;
+}
+button:hover {
+  background-color: #222;
+}
+input:focus, button:focus {
+  border-color: #555;
+}
+button.light {
+  color: #642;
+}
+button.light:focus {
+  border-color: #642;
+}
+button.sound {
+  color: #238;
+}
+button.sound:focus {
+  border-color: #238;
+}
+button.scene {
+  color: #529;
+}
+button.scene:focus {
+  border-color: #529;
+}
+#status {
+  margin-top: 20px;
+  font-weight: bold;
+  color: #050;
+}
+#potValue {
+  margin-top: 10px;
+}
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-top: 10px;
+}
+.grid button {
+  padding: 10px;
+}
+.blink {
+  animation: blink 1s infinite;
+}
+@keyframes blink {
+  50% { opacity: 0; }
+}
