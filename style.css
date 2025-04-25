@@ -46,11 +46,16 @@ button.scene:focus {
 #status {
   margin-top: 20px;
 }
-#status.success {
-  color: #0f0;
+.success {
+  color: green;
 }
-#status.error {
-  color: #f00;
+
+.error {
+  color: red;
+}
+
+.warning {
+  color: orange;
 }
 #potValue {
   margin-top: 20px;
@@ -74,7 +79,7 @@ button.scene:focus {
 }
 .wifi-container label {
   display: block;
-  margin-bottom: 5px;
+  margin-bottom: 20px;
 }
 .wifi-container input {
   margin-bottom: 10px;
