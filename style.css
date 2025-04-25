@@ -43,8 +43,11 @@ button.scene {
 button.scene:focus {
   border-color: #d5f;
 }
-#status {
+#status{
   margin-top: 20px;
+}
+#arduino-ip-display {
+  margin-bottom: 20px;
 }
 .success {
   color: green;
