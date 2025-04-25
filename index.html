@@ -5,11 +5,12 @@
   <title>BLE Potentiometer</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="style.css">
+  <script src="script.js"></script>
 </head>
 <body>
   <h2>BLE remote</h2>
   <button onclick="connectBLE()">Connect to BLE Device</button>
-  <div id="status">Status: Not connected</div>
+  <div id="status" class="error">Status: Not connected</div>
   <div id="potValue">Potentiometer Value: N/A</div>
 
   <div class="grid">
@@ -24,67 +25,5 @@
     <button class="scene" onclick="buttonClick(9)">Gang</button>
     <button class="scene" onclick="buttonClick(10)">Toilet</button>
   </div>
-
-  <script>
-    const SERVICE_UUID = '0000180c-0000-1000-8000-00805f9b34fb'; // Custom service UUID
-    const POT_CHAR_UUID = '00002a56-0000-1000-8000-00805f9b34fb'; // Potentiometer characteristic UUID
-    let buttonCharacteristic;
-
-    async function connectBLE() {
-      const status = document.getElementById('status');
-      const potValue = document.getElementById('potValue');
-      try {
-        status.textContent = 'Requesting Bluetooth device...';
-        const device = await navigator.bluetooth.requestDevice({
-          filters: [{ namePrefix: 'Nano33-Test' }],
-          optionalServices: [SERVICE_UUID]
-        });
-
-        status.textContent = 'Connecting...';
-        const server = await device.gatt.connect();
-        const service = await server.getPrimaryService(SERVICE_UUID);
-        characteristic = await service.getCharacteristic(POT_CHAR_UUID);
-        buttonCharacteristic = await service.getCharacteristic('00002a57-0000-1000-8000-00805f9b34fb'); // Button characteristic
-
-        status.textContent = 'Connected to device!';
-        status.classList.add('blink'); // Blink status when connected
-
-        // Read potentiometer value periodically
-        setInterval(async () => {
-          try {
-            const value = await characteristic.readValue();
-            const potValueInt = value.getUint16(0, true); // Read as 16-bit unsigned integer
-            console.log('Raw Potentiometer Value:', potValueInt); // Log raw value
-            potValue.textContent = `Potentiometer Value: ${potValueInt}`;
-          } catch (error) {
-            console.error('Error reading potentiometer value:', error);
-          }
-        }, 500);
-
-        device.addEventListener('gattserverdisconnected', () => {
-          status.textContent = 'Disconnected from device';
-          status.classList.remove('blink');
-          potValue.textContent = 'Potentiometer Value: N/A';
-        });
-      } catch (error) {
-        console.error('Error:', error);
-        status.textContent = 'Error: ' + error.message;
-      }
-    }
-
-    function buttonClick(buttonNumber) {
-      console.log(`Button ${buttonNumber} clicked`);
-      if (buttonCharacteristic) {
-        const value = new Uint8Array([buttonNumber]);
-        buttonCharacteristic.writeValue(value).then(() => {
-          console.log(`Button ${buttonNumber} sent to Arduino`);
-        }).catch(error => {
-          console.error('Error sending button press:', error);
-        });
-      } else {
-        console.error('Button characteristic not available');
-      }
-    }
-  </script>
 </body>
 </html>
