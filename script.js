@@ -9,8 +9,7 @@ async function connectBLE() {
     status.textContent = 'Requesting Bluetooth device...';
     status.className = '';
     const device = await navigator.bluetooth.requestDevice({
-      filters: [{ namePrefix: 'Nano33-Test' }],
-      optionalServices: [SERVICE_UUID]
+      acceptAllDevices: true
     });
 
     status.textContent = 'Connecting...';
