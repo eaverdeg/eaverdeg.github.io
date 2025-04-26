@@ -44,19 +44,18 @@ button.scene:focus {
   border-color: #d5f;
 }
 #status{
+  margin-bottom: 20px;
   margin-top: 20px;
 }
 #arduino-ip-display {
-  margin-bottom: 20px;
+  margin-top: 20px;
 }
 .success {
   color: green;
 }
-
 .error {
   color: red;
 }
-
 .warning {
   color: orange;
 }
@@ -67,7 +66,7 @@ button.scene:focus {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 5px;
-  margin-top: 20px;
+  margin-bottom: 10px;
 }
 .grid button {
   padding: 10px;
@@ -86,11 +85,6 @@ button.scene:focus {
 }
 .wifi-container input {
   margin-bottom: 10px;
-  width: 100%;
-  box-sizing: border-box; /* Ensure padding and border are included in width */
-}
-.wifi-container button {
-  margin-top: 10px;
   width: 100%;
   box-sizing: border-box; /* Ensure padding and border are included in width */
 }

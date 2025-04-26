@@ -69,34 +69,15 @@ async function connectWiFi() {
   }
 }
 
-async function fetchArduinoIP() {
-  const status = document.getElementById('arduino-ip-display');
-  try {
-    const response = await fetch('http://192.168.0.233/get_ip'); // Replace with the Arduino's known IP or hostname
-    if (response.ok) {
-      arduinoIP = await response.text();
-      status.textContent = `Arduino IP: ${arduinoIP}`;
-      console.log(`Arduino IP fetched: ${arduinoIP}`);
-    } else {
-      throw new Error(`HTTP error: ${response.status}`);
-    }
-  } catch (error) {
-    console.error('Error fetching Arduino IP:', error);
-    status.textContent = 'Arduino IP: Not available';
-  }
-}
-
 async function lightUpLEDs() {
   const status = document.getElementById('status');
+  const ipInput = document.getElementById('arduino-ip');
+  arduinoIP = ipInput.value.trim();
 
   if (!arduinoIP) {
-    status.textContent = 'Arduino IP not available. Fetching IP...';
-    await fetchArduinoIP(); // Try to fetch the IP address
-    if (!arduinoIP) {
-      status.textContent = 'Failed to fetch Arduino IP.';
-      status.className = 'error'; // Red text for error
-      return;
-    }
+    status.textContent = 'Arduino IP not available. Please enter it manually.';
+    status.className = 'error'; // Red text for error
+    return;
   }
 
   console.log(`Sending request to: http://${arduinoIP}/light_up_leds`);
@@ -116,9 +97,6 @@ async function lightUpLEDs() {
     status.className = 'error'; // Red text for error
   }
 }
-
-// Periodically fetch the Arduino's IP address
-setInterval(fetchArduinoIP, 5000); // Poll every 5 seconds
 
 function saveWiFiCredentials() {
   const ssid = document.getElementById('ssid').value;

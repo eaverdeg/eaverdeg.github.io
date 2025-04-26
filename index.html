@@ -11,8 +11,6 @@
 
   <button onclick="connectBLE()">Connect to BLE Device</button>
   <div id="status" class="error">Status: Not connected</div>
-  <div id="arduino-ip-display">Arduino IP: Not available</div>
-  <button onclick="lightUpLEDs()">Light Up LEDs</button>
 
   <div class="grid">
     <button class="light" onclick="buttonClick('A1')">Beacon</button>
@@ -31,8 +29,14 @@
     <label>Continue over Wi-Fi</label>
     <input type="text" id="ssid" placeholder="Enter Wi-Fi SSID">
     <input type="password" id="password" placeholder="Enter Wi-Fi Password">
-    <button onclick="connectWiFi()">Send Wi-Fi Credentials</button>
-    <button onclick="saveWiFiCredentials()">Save Wi-Fi Credentials</button>
+    <div class="grid">
+      <button onclick="connectWiFi()">Send</button>
+      <button onclick="saveWiFiCredentials()">Save</button>
+    </div>
+    <input type="text" id="arduino-ip" placeholder="Enter Arduino IP" value="192.168.0.233">
+    <div class="grid">
+      <button onclick="lightUpLEDs()">Test</button>
+    </div>
   </div>
 
 </body>
