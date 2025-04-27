@@ -11,6 +11,7 @@ input, button {
   display: block;
   font-size: 16px;
   width: 100%;
+  height: 60px;
   padding: 10px;
   background-color: #222;
   color: white;
@@ -18,6 +19,10 @@ input, button {
   border-radius: 5px;
   margin-bottom: 10px;
   box-sizing: border-box; /* Ensure padding and border are included in width */
+}
+input, text {
+  grid-column: span 2;
+  margin: 0;
 }
 button:hover {
   background-color: #333;
@@ -51,13 +56,13 @@ button.scene:focus {
   margin-top: 20px;
 }
 .success {
-  color: green;
+  color: #0f9;
 }
 .error {
-  color: red;
+  color: #d55;
 }
 .warning {
-  color: orange;
+  color: #fc3;
 }
 #potValue {
   margin-top: 20px;
@@ -65,15 +70,14 @@ button.scene:focus {
 .grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 5px;
+  gap: 10px;
   margin-bottom: 10px;
 }
 .grid button {
   padding: 10px;
   margin: 0;
 }
-.wifi-container {
-  margin-top: 20px;
+.wifi-container, .BLE-container {
   max-width: 400px;
   margin-left: auto;
   margin-right: auto;
@@ -83,25 +87,12 @@ button.scene:focus {
   display: block;
   margin-bottom: 20px;
 }
-.wifi-container input {
-  margin-bottom: 10px;
-  width: 100%;
-  box-sizing: border-box; /* Ensure padding and border are included in width */
-}
 .blink {
   animation: blink 1s infinite;
 }
 @keyframes blink {
   50% { opacity: 0; }
 }
-.instruction-grid {
-  display: flex;
-  justify-content: center;
-  gap: 10px; /* Add spacing between buttons */
-  margin-top: 10px; /* Add spacing above the grid */
-}
-
-.instruction-grid button {
-  padding: 10px 20px;
-  font-size: 16px;
+button.active {
+  background-color: #444;
 }

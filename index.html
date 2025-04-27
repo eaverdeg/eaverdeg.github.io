@@ -9,35 +9,55 @@
 </head>
 <body>
 
-  <button onclick="connectBLE()">Connect to BLE Device</button>
+  <div class="BLE-container" id="BLE-container">
+    <button onclick="connectBLE()">Connect to BLE Device</button>
+
+    <div class="grid">
+      <button class="light" id="btn-A1" onclick="buttonClick('A1')">Intensity</button>
+      <button class="light" id="btn-A2" onclick="buttonClick('A2')">Color</button>
+      <button class="light" id="btn-A3" onclick="buttonClick('A3')">Focus</button>
+      <button class="light" id="btn-A4" onclick="buttonClick('A4')">Time</button>
+      <button class="light" id="btn-A5" onclick="buttonClick('A5')">Alarm</button>
+    </div>
+    <div class="grid">
+      <button class="sound" id="btn-B1" onclick="buttonClick('B1')">Volume</button>
+      <button class="sound" id="btn-B2" onclick="buttonClick('B2')">Speed</button>
+      <button class="sound" id="btn-B3" onclick="buttonClick('B3')">Voice</button>
+      <button class="sound" id="btn-B3" onclick="buttonClick('B4')">Message</button>
+    </div>
+    <div class="grid">
+      <button onclick="buttonClick('cycle')">Cycle</button>
+      <button onclick="buttonClick('pick')">Pick</button>
+    </div>
+  <!--  <button onclick="toggleWiFi()">Continue over Wi-Fi</button> -->
+  </div>
+
+  <div class="wifi-container" id="wifi-container" style="display: none;">
+
+    <div class="grid">
+      <input style="grid-column: span 3;" type="text" id="ssid" placeholder="Enter Wi-Fi SSID">
+      <input style="grid-column: span 3;" type="password" id="password" placeholder="Enter Wi-Fi Password">
+      <button onclick="saveWiFiCredentials()">Save</button>
+      <button style="grid-column: span 2;" onclick="connectWiFi()">Switch to Wi-Fi</button>
+    </div>
+    
+    <div class="grid">
+      <button onclick="changeScene()">Orion 1</button>
+      <input style="grid-column: span 2;" type="text" id="arduino-ip" placeholder="Enter Arduino IP" value="192.168.0.233">
+    </div>
+
+    <div class="grid">
+      <button class="scene" id="btn-C1" onclick="changeScene('C1')">Bed</button>
+      <button class="scene" id="btn-C2" onclick="changeScene('C2')">Kamer</button>
+      <button class="scene" id="btn-C3" onclick="changeScene('C3')">Gang</button>
+      <button class="scene" id="btn-C4" onclick="changeScene('C4')">Toilet</button>
+    </div>
+
+    <button onclick="disconnectWiFiAndReconnectBLE()">Back to BLE</button>
+  </div>
+
   <div id="status" class="error">Status: Not connected</div>
 
-  <div class="grid">
-    <button class="light" onclick="buttonClick('A1')">Beacon</button>
-    <button class="light" onclick="buttonClick('A2')">Focus</button>
-    <button class="light" onclick="buttonClick('A3')">Monitor</button>
-    <button class="sound" onclick="buttonClick('B1')">Man</button>
-    <button class="sound" onclick="buttonClick('B2')">Vrouw</button>
-    <button class="sound" onclick="buttonClick('B3')">Partner</button>
-    <button class="scene" onclick="buttonClick('C1')">Bed</button>
-    <button class="scene" onclick="buttonClick('C2')">Kamer</button>
-    <button class="scene" onclick="buttonClick('C3')">Gang</button>
-    <button class="scene" onclick="buttonClick('C4')">Toilet</button>
-  </div>
-
-  <div class="wifi-container">
-    <label>Continue over Wi-Fi</label>
-    <input type="text" id="ssid" placeholder="Enter Wi-Fi SSID">
-    <input type="password" id="password" placeholder="Enter Wi-Fi Password">
-    <div class="grid">
-      <button onclick="connectWiFi()">Send</button>
-      <button onclick="saveWiFiCredentials()">Save</button>
-    </div>
-    <input type="text" id="arduino-ip" placeholder="Enter Arduino IP" value="192.168.0.233">
-    <div class="grid">
-      <button onclick="lightUpLEDs()">Test</button>
-    </div>
-  </div>
-
+  <pre id="logDisplay"></pre>
 </body>
 </html>
