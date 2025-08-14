@@ -1,211 +1,120 @@
-const SERVICE_UUID = '0000180c-0000-1000-8000-00805f9b34fb';
-const SSID_CHAR_UUID = '00002a57-0000-1000-8000-00805f9b34fb';
-const PASSWORD_CHAR_UUID = '00002a58-0000-1000-8000-00805f9b34fb';
-let ssidCharacteristic;
-let passwordCharacteristic;
-let arduinoIP = null;
-let logCharacteristic;
+const canvas = document.getElementById('grid');
+const ctx = canvas.getContext('2d');
 
-async function connectBLE() {
-  const status = document.getElementById('status');
-  try {
-    status.textContent = 'Requesting Bluetooth device...';
-    status.className = '';
-    const device = await navigator.bluetooth.requestDevice({
-      filters: [{ namePrefix: 'Arduino' }],
-      optionalServices: [SERVICE_UUID]
-    });
+const gridSize = 10; // number of squares per side
+const unit = 40; // 40 cm per square
+const tileWidth = unit;
+const tileHeight = unit / 2;
+const heightUnit = tileHeight; // vertical scale per 40 cm
 
-    status.textContent = 'Connecting...';
-    status.className = '';
-    const server = await device.gatt.connect();
-    const service = await server.getPrimaryService(SERVICE_UUID);
-    ssidCharacteristic = await service.getCharacteristic(SSID_CHAR_UUID);
-    passwordCharacteristic = await service.getCharacteristic(PASSWORD_CHAR_UUID);
-    logCharacteristic = await service.getCharacteristic('00002a59-0000-1000-8000-00805f9b34fb');
-    await logCharacteristic.startNotifications();
-    logCharacteristic.addEventListener('characteristicvaluechanged', event => {
-      const value = new TextDecoder().decode(event.target.value);
-      document.getElementById('logDisplay').textContent = value;
-    });
+let orientation = 0; // 0 or 90 degrees
+let mode = null; // current action
+const panels = [];
 
-    if (!status.textContent.includes('Wi-Fi connected')) {
-      status.textContent = 'Connected to BLE device!';
-      status.className = 'success';
-    }
+function isoToScreen(x, y) {
+  return {
+    x: (x - y) * tileWidth / 2 + canvas.width / 2,
+    y: (x + y) * tileHeight / 2
+  };
+}
 
-    device.addEventListener('gattserverdisconnected', () => {
-      if (!status.textContent.includes('Wi-Fi connected')) {
-        status.textContent = 'Disconnected from BLE device';
-        status.className = 'warning';
-      }
-    });
-  } catch (error) {
-    status.textContent = 'Error: ' + error.message;
-    status.className = 'error';
+function screenToIso(sx, sy) {
+  const cx = sx - canvas.width / 2;
+  const a = cx / (tileWidth / 2);
+  const b = sy / (tileHeight / 2);
+  const x = (a + b) / 2;
+  const y = b - x;
+  return { x, y };
+}
+
+function drawGrid() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.strokeStyle = '#ADD8E6';
+  for (let i = 0; i <= gridSize; i++) {
+    let a = isoToScreen(i, 0);
+    let b = isoToScreen(i, gridSize);
+    ctx.beginPath();
+    ctx.moveTo(a.x, a.y);
+    ctx.lineTo(b.x, b.y);
+    ctx.stroke();
+    a = isoToScreen(0, i);
+    b = isoToScreen(gridSize, i);
+    ctx.beginPath();
+    ctx.moveTo(a.x, a.y);
+    ctx.lineTo(b.x, b.y);
+    ctx.stroke();
   }
+  panels.forEach(drawPanel);
 }
 
-async function connectWiFi() {
-  const ssid = document.getElementById('ssid').value;
-  const password = document.getElementById('password').value;
-  const status = document.getElementById('status');
+function drawEdge(base, h) {
+  ctx.beginPath();
+  ctx.moveTo(base.x, base.y);
+  ctx.lineTo(base.x, base.y - h);
+  ctx.stroke();
+  [0, h / 2, h].forEach(pos => {
+    ctx.beginPath();
+    ctx.arc(base.x, base.y - pos, 3, 0, Math.PI * 2);
+    ctx.fill();
+  });
+}
 
-  if (!ssid || !password) {
-    status.textContent = 'Please enter both SSID and password.';
-    status.className = 'error';
-    return;
+function drawPanel(p) {
+  ctx.strokeStyle = '#8B0000';
+  ctx.fillStyle = '#8B0000';
+  const h = 5 * heightUnit; // 200 cm height
+  let base1, base2;
+  if (p.orientation === 0) {
+    base1 = isoToScreen(p.x, p.y);
+    base2 = isoToScreen(p.x + p.length, p.y);
+  } else {
+    base1 = isoToScreen(p.x, p.y);
+    base2 = isoToScreen(p.x, p.y + p.length);
   }
-
-  if (!ssidCharacteristic) {
-    status.textContent = 'Error: BLE not connected.';
-    status.className = 'error';
-    return;
-  }
-
-  status.textContent = 'Wi-Fi credentials sent, waiting for connection...';
-  status.className = '';
-
-  try {
-    await ssidCharacteristic.writeValue(new TextEncoder().encode(ssid));
-  } catch (error) {}
-
-  try {
-    await passwordCharacteristic.writeValue(new TextEncoder().encode(password));
-  } catch (error) {}
-
-  setTimeout(pollWiFiStatus, 4000);
+  drawEdge(base1, h);
+  drawEdge(base2, h);
+  ctx.beginPath();
+  ctx.moveTo(base1.x, base1.y - h);
+  ctx.lineTo(base2.x, base2.y - h);
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(base1.x, base1.y);
+  ctx.lineTo(base2.x, base2.y);
+  ctx.stroke();
 }
 
-async function changeScene() {
-  updateArduinoIP();
-  if (!arduinoIP) return;
-  try {
-    await fetch(`http://${arduinoIP}/change_scene`);
-  } catch (error) {}
-}
+document.getElementById('add40').onclick = () => { mode = 'add40'; };
+document.getElementById('add80').onclick = () => { mode = 'add80'; };
+document.getElementById('remove').onclick = () => { mode = 'remove'; };
+document.getElementById('rotate').onclick = () => {
+  orientation = orientation === 0 ? 90 : 0;
+  document.getElementById('orientationDisplay').textContent = `Orientation: ${orientation}°`;
+};
 
-function saveWiFiCredentials() {
-  const ssid = document.getElementById('ssid').value;
-  const password = document.getElementById('password').value;
-  if (!ssid || !password) return;
-  localStorage.setItem('wifiSSID', ssid);
-  localStorage.setItem('wifiPassword', password);
-}
-
-function restoreWiFiCredentials() {
-  const ssid = localStorage.getItem('wifiSSID');
-  const password = localStorage.getItem('wifiPassword');
-  if (ssid) document.getElementById('ssid').value = ssid;
-  if (password) document.getElementById('password').value = password;
-}
-
-function buttonClick(buttonId) {
-  // Only highlight if the button has an id in the DOM
-  const btn = document.querySelector(`#BLE-container #btn-${buttonId}, #wifi-container #btn-${buttonId}`);
-  if (btn) {
-    // Remove 'active' from all buttons with an id starting with 'btn-'
-    document.querySelectorAll('#BLE-container button[id^="btn-"], #wifi-container button[id^="btn-"]').forEach(b => {
-      b.classList.remove('active');
-    });
-    btn.classList.add('active');
-  }
-  if (!ssidCharacteristic || !passwordCharacteristic) return;
-  try {
-    ssidCharacteristic.writeValue(new TextEncoder().encode(buttonId));
-  } catch (error) {}
-}
-
-function toggleWiFi() {
-  document.getElementById('BLE-container').style.display = 'none';
-  document.getElementById('wifi-container').style.display = 'block';
-}
-
-function toggleBLE() {
-  document.getElementById('BLE-container').style.display = 'block';
-  document.getElementById('wifi-container').style.display = 'none';
-}
-
-async function disconnectWiFiAndReconnectBLE() {
-  const status = document.getElementById('status');
-  toggleBLE();
-  updateArduinoIP();
-  if (!arduinoIP) {
-    status.textContent = 'Arduino IP not available.';
-    status.className = 'error';
-    return;
-  }
-  try {
-    const response = await fetch(`http://${arduinoIP}/disconnect_wifi`);
-    if (response.ok) {
-      status.textContent = 'Wi-Fi disconnected. Reconnecting to BLE...';
-      status.className = 'warning';
-    } else {
-      throw new Error();
-    }
-  } catch (error) {
-    status.textContent = 'Error disconnecting Wi-Fi.';
-    status.className = 'error';
-    return;
-  }
-  await new Promise((resolve) => setTimeout(resolve, 2000));
-  try {
-    const device = await navigator.bluetooth.requestDevice({
-      filters: [{ namePrefix: 'Arduino' }],
-      optionalServices: [SERVICE_UUID]
-    });
-    const server = await device.gatt.connect();
-    const service = await server.getPrimaryService(SERVICE_UUID);
-    ssidCharacteristic = await service.getCharacteristic(SSID_CHAR_UUID);
-    passwordCharacteristic = await service.getCharacteristic(PASSWORD_CHAR_UUID);
-    status.textContent = 'Reconnected to BLE.';
-    status.className = 'success';
-  } catch (error) {
-    status.textContent = 'Error reconnecting to BLE.';
-    status.className = 'error';
-  }
-}
-
-function updateArduinoIP() {
-  const ipInput = document.getElementById('arduino-ip');
-  arduinoIP = ipInput.value.trim();
-}
-
-async function pollWiFiStatus() {
-  updateArduinoIP();
-  const status = document.getElementById('status');
-  if (!arduinoIP) return;
-  try {
-    const response = await fetch(`http://${arduinoIP}/wifi_status`);
-    if (response.ok) {
-      const text = await response.text();
-      if (text.includes('connected')) {
-        status.textContent = 'Wi-Fi connected!';
-        status.className = 'success';
+canvas.addEventListener('click', e => {
+  const rect = canvas.getBoundingClientRect();
+  const sx = e.clientX - rect.left;
+  const sy = e.clientY - rect.top;
+  const iso = screenToIso(sx, sy);
+  const gx = Math.floor(iso.x);
+  const gy = Math.floor(iso.y);
+  if (mode === 'add40' || mode === 'add80') {
+    const length = mode === 'add40' ? 1 : 2;
+    panels.push({ x: gx, y: gy, length, orientation });
+    drawGrid();
+  } else if (mode === 'remove') {
+    const idx = panels.findIndex(p => {
+      if (p.orientation === 0) {
+        return gy === p.y && gx >= p.x && gx < p.x + p.length;
       } else {
-        status.textContent = 'Wi-Fi not connected.';
-        status.className = 'error';
+        return gx === p.x && gy >= p.y && gy < p.y + p.length;
       }
-    } else {
-      status.textContent = 'Could not check Wi-Fi status.';
-      status.className = 'error';
+    });
+    if (idx >= 0) {
+      panels.splice(idx, 1);
+      drawGrid();
     }
-  } catch (error) {
-    status.textContent = 'Could not reach Arduino for Wi-Fi status.';
-    status.className = 'error';
   }
-}
+});
 
-async function fetchLog() {
-  updateArduinoIP();
-  if (!arduinoIP) return;
-  try {
-    const response = await fetch(`http://${arduinoIP}/get_log`);
-    if (response.ok) {
-      const text = await response.text();
-      document.getElementById('logDisplay').textContent = text;
-    }
-  } catch (error) {
-    console.error('Failed to fetch log:', error);
-  }
-}
+drawGrid();
