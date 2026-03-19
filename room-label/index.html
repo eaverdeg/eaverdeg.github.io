@@ -259,7 +259,7 @@
         const tr = document.createElement("tr");
         tr.innerHTML = [
           `<td class="mono">${ev.iso_time}</td>`,
-          `<td>${ev.room || ""}</td>`
+          `<td class="mono">${ev.room || ""}</td>`
         ].join("");
         logBody.appendChild(tr);
       });
@@ -268,11 +268,11 @@
     }
 
     function toCsv(events) {
-      const header = ["iso_time", "epoch_ms", "event_type", "room"];
-      const rows = events.map((ev) => [
+      const header = ["iso_time", "room"];
+      const rows = events
+        .filter((ev) => ev.event_type === "enter_room")
+        .map((ev) => [
         ev.iso_time,
-        String(ev.epoch_ms),
-        ev.event_type,
         ev.room || ""
       ]);
       return [header, ...rows]
