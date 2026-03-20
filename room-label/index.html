@@ -157,10 +157,26 @@
       font-size: 0.86rem;
     }
 
+    .undo-redo-group {
+      grid-column: span 1;
+      display: flex;
+      gap: 10px;
+    }
+
+    .undo-redo-group button {
+      flex: 1;
+      min-height: 64px;
+      padding: 8px 4px;
+      font-size: 1.4rem;
+    }
+
     @media (max-width: 480px) {
       button {
         min-height: 58px;
         font-size: 0.98rem;
+      }
+      .undo-redo-group button {
+        min-height: 58px;
       }
     }
   </style>
@@ -194,6 +210,7 @@
       { value: "badkamer", label: "Badkamer" },
       { value: "trap", label: "Trap" },
       { value: "inkom", label: "Inkom" },
+      { value: "wc", label: "WC" },
       { value: "buiten", label: "Buiten" }
     ];
 
@@ -402,19 +419,23 @@
         roomButtonsWrap.appendChild(btn);
       });
 
-      // Add Undo button (position 8 in 3-column grid)
+      // Add Undo/Redo group (position 8 in 3-column grid)
+      const undoRedoGroup = document.createElement("div");
+      undoRedoGroup.className = "undo-redo-group";
+      
       const undoBtn = document.createElement("button");
       undoBtn.id = "undoBtn";
       undoBtn.className = "action";
-      undoBtn.textContent = "Undo";
-      roomButtonsWrap.appendChild(undoBtn);
+      undoBtn.textContent = "←";
+      undoRedoGroup.appendChild(undoBtn);
 
-      // Add Redo button (position 9 in 3-column grid)
       const redoBtn = document.createElement("button");
       redoBtn.id = "redoBtn";
       redoBtn.className = "action";
-      redoBtn.textContent = "Redo";
-      roomButtonsWrap.appendChild(redoBtn);
+      redoBtn.textContent = "→";
+      undoRedoGroup.appendChild(redoBtn);
+      
+      roomButtonsWrap.appendChild(undoRedoGroup);
     }
 
     loadState();
