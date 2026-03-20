@@ -115,7 +115,8 @@
       color: var(--red);
     }
 
-    button[data-room="tuin"] {
+    button[data-room="tuin"],
+    button[data-room="buiten"] {
       color: #22c55e;
     }
 
@@ -211,6 +212,7 @@
       { value: "trap", label: "Trap" },
       { value: "inkom", label: "Inkom" },
       { value: "wc", label: "WC" },
+      { value: "buiten", label: "Buiten" },
       { value: "tuin", label: "Tuin" }
     ];
 
@@ -415,7 +417,7 @@
 
       topControlsWrap.appendChild(undoRedoGroup);
 
-      // Room buttons (8 total in grid)
+      // Room buttons (9 total in grid)
       ROOMS.forEach((roomInfo) => {
         const btn = document.createElement("button");
         btn.className = "room";
