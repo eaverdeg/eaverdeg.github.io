@@ -73,7 +73,7 @@
 
     .grid-top {
       display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
+      grid-template-columns: repeat(4, minmax(0, 1fr));
       gap: 10px;
     }
 
@@ -115,7 +115,7 @@
       color: var(--red);
     }
 
-    button[data-room="buiten"] {
+    button[data-room="tuin"] {
       color: #22c55e;
     }
 
@@ -211,7 +211,7 @@
       { value: "trap", label: "Trap" },
       { value: "inkom", label: "Inkom" },
       { value: "wc", label: "WC" },
-      { value: "buiten", label: "Buiten" }
+      { value: "tuin", label: "Tuin" }
     ];
 
     const STORAGE_KEY = "room-label-events-v1";
@@ -385,7 +385,7 @@
     }
 
     function createRoomButtons() {
-      // Top controls: Wissen + Download CSV
+      // Top controls: Wissen + Download + Undo/Redo
       const clearBtn = document.createElement("button");
       clearBtn.id = "clearBtn";
       clearBtn.className = "danger";
@@ -395,10 +395,27 @@
       const downloadBtn = document.createElement("button");
       downloadBtn.id = "downloadBtn";
       downloadBtn.className = "action";
-      downloadBtn.textContent = "Download CSV";
+      downloadBtn.textContent = "Download";
       topControlsWrap.appendChild(downloadBtn);
 
-      // Room buttons (7 total in grid)
+      const undoRedoGroup = document.createElement("div");
+      undoRedoGroup.className = "undo-redo-group";
+
+      const undoBtn = document.createElement("button");
+      undoBtn.id = "undoBtn";
+      undoBtn.className = "action";
+      undoBtn.textContent = "←";
+      undoRedoGroup.appendChild(undoBtn);
+
+      const redoBtn = document.createElement("button");
+      redoBtn.id = "redoBtn";
+      redoBtn.className = "action";
+      redoBtn.textContent = "→";
+      undoRedoGroup.appendChild(redoBtn);
+
+      topControlsWrap.appendChild(undoRedoGroup);
+
+      // Room buttons (8 total in grid)
       ROOMS.forEach((roomInfo) => {
         const btn = document.createElement("button");
         btn.className = "room";
@@ -418,24 +435,6 @@
         });
         roomButtonsWrap.appendChild(btn);
       });
-
-      // Add Undo/Redo group (position 8 in 3-column grid)
-      const undoRedoGroup = document.createElement("div");
-      undoRedoGroup.className = "undo-redo-group";
-      
-      const undoBtn = document.createElement("button");
-      undoBtn.id = "undoBtn";
-      undoBtn.className = "action";
-      undoBtn.textContent = "←";
-      undoRedoGroup.appendChild(undoBtn);
-
-      const redoBtn = document.createElement("button");
-      redoBtn.id = "redoBtn";
-      redoBtn.className = "action";
-      redoBtn.textContent = "→";
-      undoRedoGroup.appendChild(redoBtn);
-      
-      roomButtonsWrap.appendChild(undoRedoGroup);
     }
 
     loadState();
