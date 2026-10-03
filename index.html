@@ -1,63 +1,19 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <meta charset="utf-8">
-  <title>BLE Remote</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="UTF-8">
+  <title>Panel Configurator</title>
   <link rel="stylesheet" href="style.css">
   <script src="script.js" defer></script>
 </head>
 <body>
-
-  <div class="BLE-container" id="BLE-container">
-    <button onclick="connectBLE()">Connect to BLE Device</button>
-
-    <div class="grid">
-      <button class="light" id="btn-A1" onclick="buttonClick('A1')">Intensity</button>
-      <button class="light" id="btn-A2" onclick="buttonClick('A2')">Color</button>
-      <button class="light" id="btn-A3" onclick="buttonClick('A3')">Focus</button>
-      <button class="light" id="btn-A4" onclick="buttonClick('A4')">Time</button>
-      <button class="light" id="btn-A5" onclick="buttonClick('A5')">Alarm</button>
-    </div>
-    <div class="grid">
-      <button class="sound" id="btn-B1" onclick="buttonClick('B1')">Volume</button>
-      <button class="sound" id="btn-B2" onclick="buttonClick('B2')">Speed</button>
-      <button class="sound" id="btn-B3" onclick="buttonClick('B3')">Voice</button>
-      <button class="sound" id="btn-B3" onclick="buttonClick('B4')">Message</button>
-    </div>
-    <div class="grid">
-      <button onclick="buttonClick('cycle')">Cycle</button>
-      <button onclick="buttonClick('pick')">Pick</button>
-    </div>
-  <!--  <button onclick="toggleWiFi()">Continue over Wi-Fi</button> -->
+  <div id="controls">
+    <button id="add40">Add 40x200 Panel</button>
+    <button id="add80">Add 80x200 Panel</button>
+    <button id="rotate">Rotate Panel</button>
+    <button id="remove">Remove Panel</button>
+    <span id="orientationDisplay">Orientation: 0°</span>
   </div>
-
-  <div class="wifi-container" id="wifi-container" style="display: none;">
-
-    <div class="grid">
-      <input style="grid-column: span 3;" type="text" id="ssid" placeholder="Enter Wi-Fi SSID">
-      <input style="grid-column: span 3;" type="password" id="password" placeholder="Enter Wi-Fi Password">
-      <button onclick="saveWiFiCredentials()">Save</button>
-      <button style="grid-column: span 2;" onclick="connectWiFi()">Switch to Wi-Fi</button>
-    </div>
-    
-    <div class="grid">
-      <button onclick="changeScene()">Orion 1</button>
-      <input style="grid-column: span 2;" type="text" id="arduino-ip" placeholder="Enter Arduino IP" value="192.168.0.233">
-    </div>
-
-    <div class="grid">
-      <button class="scene" id="btn-C1" onclick="changeScene('C1')">Bed</button>
-      <button class="scene" id="btn-C2" onclick="changeScene('C2')">Kamer</button>
-      <button class="scene" id="btn-C3" onclick="changeScene('C3')">Gang</button>
-      <button class="scene" id="btn-C4" onclick="changeScene('C4')">Toilet</button>
-    </div>
-
-    <button onclick="disconnectWiFiAndReconnectBLE()">Back to BLE</button>
-  </div>
-
-  <div id="status" class="error">Status: Not connected</div>
-
-  <pre id="logDisplay"></pre>
+  <canvas id="grid" width="800" height="600"></canvas>
 </body>
 </html>
