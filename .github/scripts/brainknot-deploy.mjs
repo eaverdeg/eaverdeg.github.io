@@ -29,6 +29,6 @@ const cataloguePath=join(bk,'library','catalogue.json'),catalogue=JSON.parse(awa
 catalogue.publishedAt=deployment.libraryPublishedAt||new Date().toISOString();await writeFile(cataloguePath,JSON.stringify(catalogue));
 await writeFile(join(bk,'deployment.json'),JSON.stringify({schema:1,identity:'brainknot-deployment',version:deployment.version,owner:deployment.owner,frontend:deployment.frontend.fingerprint,library:deployment.library.fingerprint,runtime:deployment.runtime.fingerprint,publishedAt:new Date().toISOString()}));
 async function size(path){let sum=0;for(const entry of await readdir(path,{withFileTypes:true})){const name=join(path,entry.name);if(entry.isDirectory())sum+=await size(name);else{const info=await lstat(name);if(!info.isFile())throw new Error('Unexpected site filesystem entry.');sum+=info.size;}}return sum;}
-if(await size(site)>1024*1024*1024)throw new Error('Assembled site exceeds Pages 1 GiB limit.');
+if(await size(site)>1_000_000_000)throw new Error('Assembled site exceeds Pages 1 GB limit.');
 for(const path of ['index.html','maze/index.html','runtime.json','library/catalogue.json'])await readFile(join(bk,path));
 console.log('Verified Studio payloads, ownership, entry files and assembled-site size.');
