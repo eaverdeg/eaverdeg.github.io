@@ -25,6 +25,8 @@ async function extract(kind,target){
 const site=resolve('_site'),bk=join(site,'bk');
 await rm(bk,{recursive:true,force:true});await mkdir(bk,{recursive:true});
 await extract('frontend',bk);await extract('library',join(bk,'library'));await extract('runtime',bk);
+const cataloguePath=join(bk,'library','catalogue.json'),catalogue=JSON.parse(await readFile(cataloguePath,'utf8'));
+catalogue.publishedAt=deployment.libraryPublishedAt||new Date().toISOString();await writeFile(cataloguePath,JSON.stringify(catalogue));
 await writeFile(join(bk,'deployment.json'),JSON.stringify({schema:1,identity:'brainknot-deployment',version:deployment.version,owner:deployment.owner,frontend:deployment.frontend.fingerprint,library:deployment.library.fingerprint,runtime:deployment.runtime.fingerprint,publishedAt:new Date().toISOString()}));
 async function size(path){let sum=0;for(const entry of await readdir(path,{withFileTypes:true})){const name=join(path,entry.name);if(entry.isDirectory())sum+=await size(name);else{const info=await lstat(name);if(!info.isFile())throw new Error('Unexpected site filesystem entry.');sum+=info.size;}}return sum;}
 if(await size(site)>1024*1024*1024)throw new Error('Assembled site exceeds Pages 1 GiB limit.');
