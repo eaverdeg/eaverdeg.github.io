@@ -27,6 +27,8 @@ jobs:
         with:
           source: ./
           destination: ./_site
+      - name: Make generated site writable for the scoped overlay
+        run: sudo chown -R "$(id -u):$(id -g)" ./_site
       - uses: actions/setup-node@v4
         with:
           node-version: '24'
