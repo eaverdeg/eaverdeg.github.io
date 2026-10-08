@@ -1,0 +1,49 @@
+name: Brainknot Pages
+run-name: Brainknot ${{ fromJSON(inputs.deployment).owner.epoch }}.${{ fromJSON(inputs.deployment).version }}
+on:
+  workflow_dispatch:
+    inputs:
+      deployment:
+        description: Verified immutable Brainknot payload descriptor
+        required: true
+        type: string
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+concurrency:
+  group: pages
+  cancel-in-progress: false
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/configure-pages@v5
+      - uses: actions/jekyll-build-pages@v1
+        with:
+          source: ./
+          destination: ./_site
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Overlay verified Brainknot payloads
+        run: node .github/scripts/brainknot-deploy.mjs
+        env:
+          BRAINKNOT_RELEASE_TOKEN: ${{ secrets.BRAINKNOT_RELEASE_TOKEN }}
+          BRAINKNOT_DEPLOYMENT_INPUT: ${{ inputs.deployment }}
+          BRAINKNOT_OWNER: ${{ vars.BRAINKNOT_OWNER }}
+          BRAINKNOT_LATEST: ${{ vars.BRAINKNOT_DEPLOYMENT }}
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./_site
+      - name: Reject superseded ownership or deployment
+        run: node .github/scripts/brainknot-check-owner.mjs
+        env:
+          BRAINKNOT_RELEASE_TOKEN: ${{ secrets.BRAINKNOT_RELEASE_TOKEN }}
+          BRAINKNOT_DEPLOYMENT_INPUT: ${{ inputs.deployment }}
+      - id: deployment
+        uses: actions/deploy-pages@v4
